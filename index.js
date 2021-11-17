@@ -1,6 +1,7 @@
-const { Client, Intents } = require('discord.js');
+const { Client, Intents} = require('discord.js');
 const { token } = require('./config.json');
 const axios = require('axios');
+const cron = require('cron');
 
 const instanceDraco = axios.create({
 	baseURL: 'https://api.mir4global.com/wallet/prices/draco'
@@ -30,7 +31,6 @@ async function atualizarValores(){
 			valor_ant_wemix = parseFloat(response.data.Data.USDWemixRatePrev)
 			valor_wemix = parseFloat(response.data.Data.DracoPriceWemix)
 			porcetagem_wemix = ((wemix / valor_ant_wemix) - 1) * 100
-			console.log(`Draco: ${draco}.`)
 		})
 		.catch(function (error) {
 			console.log(error);
@@ -51,6 +51,11 @@ setInterval(atualizarValores, 60000);
 client.once('ready', () => {
 	console.log('Ready!');
 	atualizarValores();
+	let topicAtt = new cron.CronJob('0 */1 * * * *', () => {
+		console.log(`Draco: ${draco}.`)
+	})
+
+	topicAtt.start();
 });
 
 client.on('interactionCreate', async interaction => {
