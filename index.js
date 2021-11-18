@@ -38,7 +38,7 @@ async function alertSendMessage(a){
 
 	let dracochannel = client.channels.cache.get("909187273847877632");
 
-	await dracochannel.send(`O draco bateu a meta de \$${(alertas[meta]).toFixed(3)} dolar🎆, custando agora \$${draco.toFixed(3)} (corre!), em real R\$${(dolar*draco).toFixed(2)}😁`)
+	await dracochannel.send(`O draco bateu a meta de \$${(alertas[meta]).toFixed(3)} dolar🎆, custando agora \$${draco.toFixed(3)} (corre!), em real R\$${(dolar*draco).toFixed(2)}😁 @everyone`)
   .then(message => console.log(`Sent message: ${message.content}`))
   .catch(console.error);
 }
@@ -81,6 +81,7 @@ async function atualizarValores() {
 		alertSendMessage(2);
 		if(meta < alertas.length){
 			meta += 1;
+			console.log(`Meta é : ${alertas[meta]}`)
 		}
 	}
 
