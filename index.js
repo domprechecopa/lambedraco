@@ -1,7 +1,6 @@
-const { Client, Intents} = require('discord.js');
+const { Client, Intents } = require('discord.js');
 const { token } = require('./config.json');
 const axios = require('axios');
-const cron = require('cron');
 
 const instanceDraco = axios.create({
 	baseURL: 'https://api.mir4global.com/wallet/prices/draco'
@@ -21,7 +20,14 @@ instanceDraco.post('lastest')
 		console.log(error);
 	});
 
-async function atualizarValores(){
+async function atualizarTopic(){
+	let dracochannel = client.channels.cache.get("909187273847877632");
+	await dracochannel.setTopic(`💰Draco: \$${draco.toFixed(4)} | 💵Real: R\$${(draco * dolar).toFixed(2)} | 📈Porcetagem: ${porcetagem.toFixed(2)}\%`)
+	.then(updated => console.log(`Update Topic`))
+	.catch(console.log(`Deu jaca`));
+
+}
+async function atualizarValores() {
 	await instanceDraco.post('lastest')
 		.then(function (response) {
 			draco = parseFloat(response.data.Data.USDDracoRate);
@@ -31,6 +37,7 @@ async function atualizarValores(){
 			valor_ant_wemix = parseFloat(response.data.Data.USDWemixRatePrev)
 			valor_wemix = parseFloat(response.data.Data.DracoPriceWemix)
 			porcetagem_wemix = ((wemix / valor_ant_wemix) - 1) * 100
+			console.log(`Draco: ${draco}`)
 		})
 		.catch(function (error) {
 			console.log(error);
@@ -42,20 +49,17 @@ async function atualizarValores(){
 		.catch(function (error) {
 			console.log(error);
 		});
+
 }
 
 setInterval(atualizarValores, 60000);
+setInterval(atualizarTopic,300000);
 
 
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
 	console.log('Ready!');
 	atualizarValores();
-	let topicAtt = new cron.CronJob('0 */1 * * * *', () => {
-		console.log(`Draco: ${draco}.`)
-	})
-
-	topicAtt.start();
 });
 
 client.on('interactionCreate', async interaction => {
@@ -77,6 +81,7 @@ client.on('interactionCreate', async interaction => {
 			console.log(error)
 		});
 	} else if (commandName === 'calcular') {
+		dolar_request = interaction.options.getNumber('dolar')
 		await interaction.reply(`Você precisara vender o draco por ${(dolar_request / wemix).toFixed(5)} WEMIX credit⚖.`).then((response) => {
 			console.log(response);
 		}).catch((error) => {
