@@ -2,6 +2,14 @@ const { Client, Intents } = require('discord.js');
 const { token } = require('./config.json');
 const axios = require('axios');
 
+
+const alertas = [2,2.5,3,3.5,4,4.5]
+
+var meta = 0
+var cont_register = 0
+
+var alert = true;
+
 const instanceDraco = axios.create({
 	baseURL: 'https://api.mir4global.com/wallet/prices/draco'
 });
@@ -12,21 +20,29 @@ const instancePriceDolar = axios.create({
 // Create a new client instanceDraco
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-instanceDraco.post('lastest')
-	.then(function (response) {
-		console.log(response.data.Data);
-	})
-	.catch(function (error) {
-		console.log(error);
-	});
+// instanceDraco.post('lastest')
+// 	.then(function (response) {
+// 		console.log(response.data.Data);
+// 	})
+// 	.catch(function (error) {
+// 		console.log(error);
+// 	});
 
-async function atualizarTopic(){
+async function atualizarTopic() {
 	let dracochannel = client.channels.cache.get("909187273847877632");
 	await dracochannel.setTopic(`💰Draco: \$${draco.toFixed(4)} | 💵Real: R\$${(draco * dolar).toFixed(2)} | 📈Porcetagem: ${porcetagem.toFixed(2)}\%`)
-	.then(updated => console.log(`Update Topic`))
-	.catch(console.log(`Deu jaca`));
-
+		.then(updated => console.log(`Update Topic`))
+		.catch(console.log(`Deu jaca`));
 }
+async function alertSendMessage(a){
+
+	let dracochannel = client.channels.cache.get("909187273847877632");
+
+	await dracochannel.send(`O draco bateu a meta de \$${(alertas[meta]).toFixed(3)} dolar🎆, custando agora \$${draco.toFixed(3)} (corre!), em real R\$${(dolar*draco).toFixed(2)}😁`)
+  .then(message => console.log(`Sent message: ${message.content}`))
+  .catch(console.error);
+}
+
 async function atualizarValores() {
 	await instanceDraco.post('lastest')
 		.then(function (response) {
@@ -37,7 +53,7 @@ async function atualizarValores() {
 			valor_ant_wemix = parseFloat(response.data.Data.USDWemixRatePrev)
 			valor_wemix = parseFloat(response.data.Data.DracoPriceWemix)
 			porcetagem_wemix = ((wemix / valor_ant_wemix) - 1) * 100
-			console.log(`Draco: ${draco}`)
+			console.log(`${cont_register} Draco: ${draco}`)
 		})
 		.catch(function (error) {
 			console.log(error);
@@ -50,10 +66,30 @@ async function atualizarValores() {
 			console.log(error);
 		});
 
+	// Criar alerta de preco
+	if (cont_register == 0) {
+		for (var i = 0; i < alertas.length; i++) {
+			if (alertas[i] < draco) {
+				meta = i + 1;
+			} else {
+				console.log(`Meta é : ${alertas[meta]}`)
+				break;
+			}
+		}
+		
+	}else if(draco >= alertas[meta]){
+		alertSendMessage(2);
+		if(meta < alertas.length){
+			meta += 1;
+		}
+	}
+
+	cont_register++;
+
 }
 
 setInterval(atualizarValores, 60000);
-setInterval(atualizarTopic,300000);
+setInterval(atualizarTopic, 300000);
 
 
 // When the client is ready, run this code (only once)
