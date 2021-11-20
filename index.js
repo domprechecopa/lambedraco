@@ -3,12 +3,14 @@ const { token } = require('./config.json');
 const axios = require('axios');
 
 
-const alertas = [2,2.5,3,3.5,4,4.5]
+const alertas = [2, 2.5, 3, 3.5, 4, 4.5]
 
 var meta = 0
 var cont_register = 0
 
 var alert = true;
+
+
 
 const instanceDraco = axios.create({
 	baseURL: 'https://api.mir4global.com/wallet/prices/draco'
@@ -33,14 +35,15 @@ async function atualizarTopic() {
 	await dracochannel.setTopic(`💰Draco: \$${draco.toFixed(4)} | 💵Real: R\$${(draco * dolar).toFixed(2)} | 📈Porcetagem: ${porcetagem.toFixed(2)}\%`)
 		.then(updated => console.log(`Update Topic`))
 		.catch(console.log(`Deu jaca`));
+	client.user.setActivity(`Draco: \$${draco.toFixed(3)} | R\$${(dolar*draco).toFixed(2)}`)
 }
-async function alertSendMessage(a){
+async function alertSendMessage(a) {
 
 	let dracochannel = client.channels.cache.get("909187273847877632");
 
-	await dracochannel.send(`O draco bateu a meta de \$${(alertas[meta]).toFixed(3)} dolar🎆, custando agora \$${draco.toFixed(3)} (corre!), em real R\$${(dolar*draco).toFixed(2)}😁 @everyone`)
-  .then(message => console.log(`Sent message: ${message.content}`))
-  .catch(console.error);
+	await dracochannel.send(`O draco bateu a meta de \$${(alertas[meta]).toFixed(3)} dolar🎆, custando agora \$${draco.toFixed(3)} (corre!), em real R\$${(dolar * draco).toFixed(2)}😁 @everyone`)
+		.then(message => console.log(`Sent message: ${message.content}`))
+		.catch(console.error);
 }
 
 async function atualizarValores() {
@@ -76,10 +79,10 @@ async function atualizarValores() {
 				break;
 			}
 		}
-		
-	}else if(draco >= alertas[meta]){
+
+	} else if (draco >= alertas[meta]) {
 		alertSendMessage(2);
-		if(meta < alertas.length){
+		if (meta < alertas.length) {
 			meta += 1;
 			console.log(`Meta é : ${alertas[meta]}`)
 		}
